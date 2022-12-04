@@ -3,12 +3,26 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post as MetadataPost;
+use ApiPlatform\Metadata\Put;
 use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    normalizationContext:['groups' => ['Post:read', 'Category:read']],
+    denormalizationContext:['groups' => ['Post:write']]
+)]
+#[Put()]
+#[Get()]
+#[GetCollection()]
+#[Delete()]
+#[MetadataPost()]
 class Post
 {
     #[ORM\Id]
@@ -17,9 +31,11 @@ class Post
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['Post:read', 'Post:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['Post:read'])]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -32,6 +48,7 @@ class Post
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[Groups(['Post:read', 'Post:write'])]
     private ?Category $category = null;
 
     public function getId(): ?int
