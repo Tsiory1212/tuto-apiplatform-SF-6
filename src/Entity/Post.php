@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -20,11 +24,16 @@ use Symfony\Component\Validator\Constraints\Valid;
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
     normalizationContext:['groups' => ['Post:read', 'Category:read']],
-    denormalizationContext:['groups' => ['Post:write', 'Category:write']]
+    denormalizationContext:['groups' => ['Post:write', 'Category:write']],
+    paginationClientItemsPerPage: true
 )]
 #[Put(validationContext: ['groups' => [Post::class, 'validationGroups']])] // ici, on utilise l'approche "Dynamic Validation Groups" (Static function)
 #[Get()]
-#[GetCollection()]
+#[GetCollection(
+    paginationItemsPerPage: 3, 
+    paginationMaximumItemsPerPage: 3
+)]
+#[ApiFilter(SearchFilter::class, properties: ["title" => "partial"])] //exact or partial => exact by default
 #[Delete()]
 #[MetadataPost(validationContext: ['groups' => ['Post:createdAt:POST:maxToDay', 'Cagegory:name:POST:validationMax']])] // Ici, on a mis une règle de validation pour la Methode POST comme => la date de création "createdAt" doit être supérieure à la date d'aujourd'hui 
 class Post
@@ -32,6 +41,7 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['Post:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
