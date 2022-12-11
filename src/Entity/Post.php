@@ -6,12 +6,16 @@ use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as MetadataPost;
 use ApiPlatform\Metadata\Put;
+use App\Controller\CountPostController;
+use App\Controller\PublishPostController;
 use App\Repository\PostRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
@@ -23,15 +27,86 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
-    normalizationContext:['groups' => ['Post:read', 'Category:read']],
+    normalizationContext:[
+        'groups' => ['Post:read', 'Category:read'],
+        'openapi_definition_name' => 'Collection-normalization-Test'
+    ],
     denormalizationContext:['groups' => ['Post:write', 'Category:write']],
-    paginationClientItemsPerPage: true
+    paginationClientItemsPerPage: true,
+    operations: [
+        new Get(),
+        new GetCollection(
+            name: 'count',
+            uriTemplate: '/posts/count',
+            controller: CountPostController::class,
+            read: false,
+            paginationEnabled: false,
+            filters: [
+                'properties' => 'content'
+            ],
+            openapiContext: [
+                'summary' =>  'Récupère le nombre total d\'article',
+                'parameters' => [
+                    [
+                        'in' => 'query',
+                        'name' => 'online',
+                        'schema' => [
+                            'type' => 'integer'
+                        ],
+                        'description' => 'Filtre les articles en ligne'
+                    ],
+                    [
+                        'in' => 'query',
+                        'name' => 'title',
+                        'apiproperties' => false,
+                        'required' => false
+
+                    ]
+                ],
+                'responses' => [
+                    '200' =>  [
+                        'description' => 'OK',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'example' => 3
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+
+            ]
+        ),
+        new MetadataPost(
+            name: 'publication',
+            // routeName: 'post_post_publication', // Ne marche pas, je sais pas pourquoi !
+            uriTemplate: '/posts/{id}/publication',
+            controller: PublishPostController::class,
+            openapiContext: [
+                'summary' =>  'Permet de publier un article'
+            ]
+        )
+    ]
 )]
 #[Put(validationContext: ['groups' => [Post::class, 'validationGroups']])] // ici, on utilise l'approche "Dynamic Validation Groups" (Static function)
-#[Get()]
+#[Get(normalizationContext: [
+    'openapi_definition_name' => 'Detail'
+])]
 #[GetCollection(
     paginationItemsPerPage: 3, 
-    paginationMaximumItemsPerPage: 3
+    paginationMaximumItemsPerPage: 3,
+    filters: [],
+    openapiContext: [
+        'summary' => 'Récupère tous les articles',
+        'parameters' => [
+            [
+                'in' => 'query',
+                'name' => 'title',
+            ]
+        ]
+    ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ["title" => "partial"])] //exact or partial => exact by default
 #[Delete()]
@@ -67,9 +142,19 @@ class Post
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts', cascade: ['persist'])] // cascade: ['persist'] => permet dire à symfony qu'on peut créé une catégorie en même temps qu'on ajoute un article
+    #[ORM\ManyToOne(inversedBy: 'posts', cascade: ['persist'])] // cascade: ['persist'] => permet de dire à symfony qu'on peut créer une catégorie en même temps qu'on ajoute un article
     #[Groups(['Post:read', 'Post:write']), Valid()]
     private ?Category $category = null;
+
+    #[ORM\Column(options: ["default" => 0])]
+    #[Groups(['Post:read', 'Post:write'])]
+    #[ApiProperty(
+        openapiContext: [
+            'example' => false,
+            'description' => 'En ligne ou pas ?'
+        ]
+    )]
+    private ?bool $online = null;
 
     public function __construct()
     {
@@ -155,6 +240,18 @@ class Post
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function isOnline(): ?bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline(bool $online): self
+    {
+        $this->online = $online;
 
         return $this;
     }
