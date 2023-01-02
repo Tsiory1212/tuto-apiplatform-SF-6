@@ -26,3 +26,8 @@ services:
         decorates: 'api_platform.openapi.factory'
         arguments: ['@App\OpenApi\OpenApiFactory.inner']
         autoconfigure: false
+
+    App\State\DependencyProvider:
+         bind:
+            $itemProvider: '@api_platform.doctrine.orm.state.item_provider'
+       

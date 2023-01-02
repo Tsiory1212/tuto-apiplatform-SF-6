@@ -21,3 +21,19 @@ Il est préférable d'accepter "Accept header" avec *application/ld+json* pour p
 
 # Documentation
 openapiContext: []
+
+# Response/Request
+si le dump php est décodé ou n'est pas lisible, on peut essayer de regarder dans le réponse XHR du navigateur
+
+# Custom Provider
+## Provider
+api_platform 2 : ContextAwareCollectionDataProviderInterface
+api_platform 3 : ProviderInterface
+            
+            ------------
+
+url : https://api-platform.com/docs/core/state-providers/
+cmd : bin/console make:state-provider
+
+**Filter**
+On ne peut pas utiliser *SearchFilter* pour les 'Class/Entity' qui n'utilisent pas doctrine 
