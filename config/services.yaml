@@ -28,6 +28,6 @@ services:
         autoconfigure: false
 
     App\State\DependencyProvider:
-         bind:
+        bind:
             $itemProvider: '@api_platform.doctrine.orm.state.item_provider'
        

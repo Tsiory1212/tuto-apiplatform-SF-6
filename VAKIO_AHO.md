@@ -25,7 +25,16 @@ openapiContext: []
 # Response/Request
 si le dump php est décodé ou n'est pas lisible, on peut essayer de regarder dans le réponse XHR du navigateur
 
-# Custom Provider
+# Custom Provider/Persister
+**Attention**
+N'oublier pas de préciser le 'processor' et le 'provider' dans l'attribut #[ApiResource] car celà créera un probleme d'opération
+
+===> #[ApiResource(
+        provider: ExampleProvider::class,
+        processor: ExampleProcessor::class
+    )]
+
+
 ## Provider
 api_platform 2 : ContextAwareCollectionDataProviderInterface
 api_platform 3 : ProviderInterface
@@ -35,5 +44,15 @@ api_platform 3 : ProviderInterface
 url : https://api-platform.com/docs/core/state-providers/
 cmd : bin/console make:state-provider
 
+
 **Filter**
 On ne peut pas utiliser *SearchFilter* pour les 'Class/Entity' qui n'utilisent pas doctrine 
+
+## Persister
+api_platform 2 : ContextAwareDataPersisterInterface
+api_platform 3 : ProcessorInterface
+            
+            ------------
+
+url : https://api-platform.com/docs/core/state-processors/
+cmd : bin/console make:state-processor
