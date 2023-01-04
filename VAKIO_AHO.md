@@ -56,3 +56,7 @@ api_platform 3 : ProcessorInterface
 
 url : https://api-platform.com/docs/core/state-processors/
 cmd : bin/console make:state-processor
+
+
+# PUT vs PATCH
+PATCH sert à une modification partielles
