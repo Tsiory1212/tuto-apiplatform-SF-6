@@ -5,6 +5,7 @@ namespace App\OpenApi;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\PathItem;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\OpenApi;
 
 class OpenApiFactory  implements OpenApiFactoryInterface
@@ -19,7 +20,69 @@ class OpenApiFactory  implements OpenApiFactoryInterface
         $openApi = $this->decorated->__invoke($context);
 
         $openApi->getPaths()->addPath('/custom', new PathItem(null, 'Custom', null, new Operation('Custom-api', [], [], 'Point d\'entrée personalisée ')));
-        return $openApi;
+        
+        // $schemas = $openApi->getComponents()->getSecuritySchemes() ?? [];
+        // $schemas['cookieAuths'] = new \ArrayObject([
+        //     'type' => 'apikey',
+        //     'in' => 'cookie',
+        //     'name' => 'PHPSESSID'
+        // ]);
+
+
+
+        /** On fait référence a l'endpoint   /api/login     */
+        $schemas = $openApi->getComponents()->getSchemas();
+        $schemas['Credentials'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'username' => [
+                    'type' => 'string',
+                    'example' => 'john@doe.fr',
+                ],
+                'password' => [
+                    'type' => 'string',
+                    'example' => '0000',
+                ],
+            ],
+        ]);
+        $pathItem = new PathItem(
+            ref: 'skdfjl',
+            post: new Operation(
+                operationId: 'postApiLogin',
+                tags: ['User'],
+                requestBody: new RequestBody(
+                    // description: 'Generate new JWT Token',
+                    content: new \ArrayObject([
+                        'application/json' => [
+                            'schema' => [
+                                '$ref' => '#/components/schemas/Credentials',
+                            ],
+                        ],
+                    ]),
+                ),
+                responses: [
+                    '200' => [
+                        'description' => 'Utilisateur connecté',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    '$ref' => '#/components/schemas/User-read.User',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/login', $pathItem);
+
+
+
+        /** Pour enlever l'icon cadena sur toutes les endpoint */
+        /** Ce qui est à l'inverse de apiPlatform 2 (Je ne sais pas pourquoi)*/
+        $openApi = $openApi->withSecurity([]); 
+
+        return $openApi; 
     }
 
     

@@ -1,0 +1,6 @@
+api_platform:
+    swagger:
+        api_keys: # En essaie ici de remplire qlchs dans le bouton 'Authorize' (ApiPlatform)
+            cookieAuth: # je sais pas si c'est approprié mais voir OpenApiFactory pour voir comment faire dans version antérieur api-platform ($schemas['cookieAuth'])  
+                name: PHPSESSID
+                type: header

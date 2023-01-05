@@ -6,6 +6,26 @@
 5- #[ApiResource()] sur l'Entity
 6- url : https://127.0.0.1:8000/api
 
+# Controller & endpoint
+**Attention**
+    on n'oublie pas l'attribut #[AsController] pour un endpoint qui utilise un Controller personnalisé
+
+## Endpoint
+**Creation**
+    - Soit à partir d'un Entity (...et on travail par des Controller ou des State(DataProvider/Persiter) )
+    - Soit on le customize par "OpenApiFactory"
+
+**Cacher**
+    #[ApiResource(
+        operations: [ 
+            new Post( openapi: false )
+        ]
+    )]
+
+**Customisation**
+    On peut utiliser "OpenApiFactory"
+    url => https://api-platform.com/docs/core/openapi/#overriding-the-openapi-specification
+
 # Règle de validation (Assert de symfony)
     Soit on peut tout de suite utiliser cette règle sur toutes les sérialisations (normalisation, dénormalisation)
     soit, On peut la définir avec des groups et on l'applique seulement que sur les sérialisation concernée (ex : PUT mais pas POST) 
@@ -60,3 +80,42 @@ cmd : bin/console make:state-processor
 
 # PUT vs PATCH
 PATCH sert à une modification partielles
+
+# AUTHENTIFICATION
+Il y a 2 types :
+  * Stateful => côté Server (Cookie json)
+  * Stateless => utilisation de jeton (ex : JWT) 
+
+
+# Privilège et Rôle (Symfony)
+    Pour restreindre une action par le Rôle de l'User, on ajoute
+    
+    #[ApiResource(
+        operations: [ 
+            new GetCollection( security: 'is_granted("ROLE_USER")' )
+        ]
+    )]
+
+    ou #[ApiResource( security: 'is_granted("ROLE_USER")' ) )]
+
+*Swagger-ui* 
+<!-- Pour ajouter l'icon Cadenas sur l'endpoint -->
+    #[ApiResource(
+        operations: [
+            new Get(
+                openapiContext: [
+                    'security' => [['cookieAuth' =>  []]]
+                ]
+            )
+        ]
+    )]
+
+<!-- Syntax -->
+api_platform 2 : 'openapi_context' => [ 'security' => ['cookieAuth' => []]] <!-- 'security' => [] -->
+api_platform 2 : openapiContext: => ['security' => [['cookieAuth' =>  []]]] <!-- 'security' => [[]] -->
+
+# Swagger
+## Bouton Authorize (api-platform)
+    Pour enrichir le contenu, 
+    voir => config/packages/api_platform.yaml 
+    ou => https://api-platform.com/docs/core/jwt/#documenting-the-authentication-mechanism-with-swaggeropen-api
