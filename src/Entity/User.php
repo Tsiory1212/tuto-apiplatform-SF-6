@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     // security: 'is_granted("ROLE_USER")' ,
     operations: [
-        new GetCollection(
+        new Get(
             name: 'me',
             paginationEnabled: false,
             uriTemplate: '/me',
@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             read: false,
             openapiContext: [
                 'security' => [['cookieAuth' =>  []]],
+                'parameters' => []
             ],
             security: "is_granted('ROLE_USER')"
 
@@ -32,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Get(
             controller: NotFoundAction::class,
             openapiContext: ['summary' => 'hidden'],
-            openapi: false,
+            openapi: false, //Pour cacher l'endpoint de l'interface
             read: false,
             output: false
         )

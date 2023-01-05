@@ -30,6 +30,17 @@ class OpenApiFactory  implements OpenApiFactoryInterface
 
 
 
+  
+        /**
+         * Un exemple de customisation d'un endpoint déjà existé        (apiPlatform 2 (???) )
+         * Ici, on enleve les parameters dans UI apiPlatform pour cet endpoint
+         */
+        $meOperation = $openApi->getPaths()->getPath('/api/me')->getGet()->withParameters([]);
+        $mePathItem = $openApi->getPaths()->getPath('/api/me')->withGet($meOperation);
+        $openApi->getPaths()->addPath('/api/me', $mePathItem);
+
+
+        
         /** On fait référence a l'endpoint   /api/login     */
         $schemas = $openApi->getComponents()->getSchemas();
         $schemas['Credentials'] = new \ArrayObject([
@@ -46,10 +57,9 @@ class OpenApiFactory  implements OpenApiFactoryInterface
             ],
         ]);
         $pathItem = new PathItem(
-            ref: 'skdfjl',
             post: new Operation(
                 operationId: 'postApiLogin',
-                tags: ['User'],
+                tags: ['Auth'],
                 requestBody: new RequestBody(
                     // description: 'Generate new JWT Token',
                     content: new \ArrayObject([
@@ -76,6 +86,18 @@ class OpenApiFactory  implements OpenApiFactoryInterface
         );
         $openApi->getPaths()->addPath('/api/login', $pathItem);
 
+
+        /** On fait référence a l'endpoint   /api/logout     */
+        $pathItem = new PathItem(
+            post: new Operation(
+                operationId: 'postApiLogout',
+                tags: ['Auth'],
+                responses: [
+                    '204' => [],
+                ]
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/logout', $pathItem);
 
 
         /** Pour enlever l'icon cadena sur toutes les endpoint */
