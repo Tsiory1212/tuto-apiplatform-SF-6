@@ -85,6 +85,11 @@ PATCH sert à une modification partielles
 Il y a 2 types :
   * Stateful => côté Server (Cookie json)
   * Stateless => utilisation de jeton (ex : JWT) 
+## JWT
+*Processus Authentification*
+  * Pour le processus, il passe d'abord dans le firewall "login" pour servir le provider "app_user_provider", 
+  * mais après, lorqu'on utilise l'endpoint "^/api", c'est le provider "jwt" qui travail, 
+  * c-à-d qu'on joue sur les JWT généré après l'authentification
 
 
 # Privilège et Rôle (Symfony)

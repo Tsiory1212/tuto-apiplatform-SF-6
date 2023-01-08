@@ -12,9 +12,7 @@ class SecurityController extends AbstractController
     #[Route(path:'/api/login', name:'api_login', methods:['POST'])]
     public function apiLogin()
     {
-        // $error = $authenticationUtils->getLastAuthenticationError();
-        // $lastUsername = $authenticationUtils->getLastUsername();
-
+        
         /** @var User $user */
         $user = $this->getUser();
         return $this->json([
