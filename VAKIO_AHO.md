@@ -119,3 +119,15 @@ api_platform 2 : openapiContext: => ['security' => [['cookieAuth' =>  []]]] <!--
     Pour enrichir le contenu, 
     voir => config/packages/api_platform.yaml 
     ou => https://api-platform.com/docs/core/jwt/#documenting-the-authentication-mechanism-with-swaggeropen-api
+
+
+# JWT
+**lexik/jwt-authentication-bundle**
+Ce bundle symfony gère l'auth JWT 
+
+**payload JWT**
+On crée une Subscriber qui implémente "EventSubscriberInterface" pour modifier le paylod dans JWT (Les infos dans le Token)
+
+**Intérrogation BDD**
+ - Pour éviter d'intérroger à chq fois le BDD lorsqu'on utilise les endpoints "api", on se sert du provider de "lexik_jwt"
+ - url : https://github.com/lexik/LexikJWTAuthenticationBundle/blob/2.x/Resources/doc/8-jwt-user-provider.rst

@@ -100,6 +100,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     filters: [],
     openapiContext: [
         'summary' => 'Récupère tous les articles',
+        'security' => [['bearerAuth' =>  []]],
         'parameters' => [
             [
                 'in' => 'query',

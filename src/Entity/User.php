@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use App\Controller\MeController;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             controller: MeController::class,
             read: false,
             openapiContext: [
-                'security' => [['cookieAuth' =>  []]],
+                'security' => [['bearerAuth' =>  []]],
                 'parameters' => []
             ],
             security: "is_granted('ROLE_USER')"
@@ -40,7 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['read:User']]
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -65,6 +65,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+   
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -131,4 +139,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
+
+    /**
+     * On gros, cette function renvoie les infos JWT décodés en base64
+     */
+    public static function createFromPayload($id, array $payload)
+    {
+        $user = (new User())->setId($id)->setEmail($payload['username'] ?? '');
+        return $user;
+    }
+
 }
