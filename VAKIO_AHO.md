@@ -91,6 +91,8 @@ Il y a 2 types :
   * mais après, lorqu'on utilise l'endpoint "^/api", c'est le provider "jwt" qui travail, 
   * c-à-d qu'on joue sur les JWT généré après l'authentification
 
+## Clé d'API
+  * Voir App\Security\ApiKeyAuthenticator et "apikey_user_provider" dans security.yaml
 
 # Privilège et Rôle (Symfony)
     Pour restreindre une action par le Rôle de l'User, on ajoute

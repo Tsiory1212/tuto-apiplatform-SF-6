@@ -9,6 +9,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        apikey_user_provider:
+            entity:
+                class: App\Entity\User
+                property: apiKey
         jwt:
             lexik_jwt: # Lorsqu'on utilise ce provider, entity User doit implementer "JWTUserInterface"
                 class: App\Entity\User
@@ -17,19 +21,27 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        login:
-            provider: app_user_provider
-            pattern: ^/api/login$ # le $ permet de dire que c'est un chemin exacte
-            stateless: true
-            json_login:
-                check_path: /api/login
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure 
-        api:
-            provider: jwt # On utilise ce provider fournit par lexik_jwt car pour les requêtes "api" on n'a pas besoin d'intéroger la BDD donnés pour avoir l'info sur l'User (Car les infos sont déjà stockés dans le Token JWT)    ---- A database-less user provider ----
-            pattern:   ^/api
-            stateless: true
-            jwt: ~
+
+        # L'idée ici c'est de pouvoir utiliser le champ "apiKey" dans User comme une pièce d'authentification. 
+        # Le Header authorization doit simplement verifier le Bearer si "apiKey" est correct
+        # Pour ce cas, l'user n'a pas besoin de s'authentifier, il doit juste posseder et montrer son "apiKey"
+        main: 
+            provider: apikey_user_provider
+            custom_authenticator: App\Security\ApiKeyAuthenticator 
+
+        # login:
+        #     provider: app_user_provider
+        #     pattern: ^/api/login$ # le $ permet de dire que c'est un chemin exacte
+        #     stateless: true
+        #     json_login:
+        #         check_path: /api/login
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure 
+        # api:
+        #     provider: jwt # On utilise ce provider fournit par lexik_jwt car pour les requêtes "api" on n'a pas besoin d'intéroger la BDD donnés pour avoir l'info sur l'User (Car les infos sont déjà stockés dans le Token JWT)    ---- A database-less user provider ----
+        #     pattern:   ^/api
+        #     stateless: true
+        #     jwt: ~
 
             
         # main:
