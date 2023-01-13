@@ -9,6 +9,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        apikey_refresh_token_user_provider:
+            entity:
+                class: App\Entity\User
+                property: id
         apikey_user_provider:
             entity:
                 class: App\Entity\User
@@ -21,7 +25,6 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
         # # L'idée ici c'est de pouvoir utiliser le champ "apiKey" dans User comme une pièce d'authentification. 
         # # Le Header authorization doit simplement verifier le Bearer si "apiKey" est correct
         # # Pour ce cas, l'user n'a pas besoin de s'authentifier, il doit juste posseder et montrer son "apiKey"
@@ -41,9 +44,11 @@ security:
             provider: jwt # On utilise ce provider fournit par lexik_jwt car pour les requêtes "api" on n'a pas besoin d'intéroger la BDD donnés pour avoir l'info sur l'User (Car les infos sont déjà stockés dans le Token JWT)    ---- A database-less user provider ----
             pattern:   ^/api
             stateless: true
+            entry_point: jwt
             jwt: ~
-
-            
+            refresh_jwt:
+                check_path: /api/token/refresh # or, you may use the `api_refresh_token` route name
+                provider: apikey_refresh_token_user_provider
         # main:
         #     lazy: true
         #     provider: app_user_provider
@@ -66,6 +71,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

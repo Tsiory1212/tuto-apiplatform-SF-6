@@ -83,13 +83,18 @@ PATCH sert à une modification partielles
 
 # AUTHENTIFICATION
 Il y a 2 types :
-  * Stateful => côté Server (Cookie json)
-  * Stateless => utilisation de jeton (ex : JWT) 
+  * Stateful => côté Server (Cookie json) <!-- Dépend de la BDD/Session  *** Server side -->
+  * Stateless => utilisation de jeton (ex : JWT) <!-- Plus légé *** Client side -->
 ## JWT
 *Processus Authentification*
   * Pour le processus, il passe d'abord dans le firewall "login" pour servir le provider "app_user_provider", 
   * mais après, lorqu'on utilise l'endpoint "^/api", c'est le provider "jwt" qui travail, 
   * c-à-d qu'on joue sur les JWT généré après l'authentification
+
+## RefreshToken
+  * ce "refresh_token" n'est pas un token JWT, c'est un token particulier sauvegarder en BDD
+  * Si on supprime l'accès au site à un User, on peut supprimer (revoke) son token (Le token ne peut plus être rafraichit), 
+    mais attention, si l'User se fait voler son token, l'usurpateur peut l'utiliser jusqu'à ce que le token expire
 
 ## Clé d'API
   * Voir App\Security\ApiKeyAuthenticator et "apikey_user_provider" dans security.yaml

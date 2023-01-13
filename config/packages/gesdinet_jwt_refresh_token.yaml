@@ -1,0 +1,4 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Entity\RefreshToken
+    user_identity_field: id # je ne sais pas pourquoi ça ne marche pas, my_solution => RefreshToken::createForUserWithTtl 
+    # single_use: true
