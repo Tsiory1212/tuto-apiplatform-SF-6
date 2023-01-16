@@ -2,13 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -16,6 +13,7 @@ use ApiPlatform\Metadata\Post as MetadataPost;
 use ApiPlatform\Metadata\Put;
 use App\Controller\CountPostController;
 use App\Controller\PublishPostController;
+use App\Entity\Interface_\UserOwnedInterface;
 use App\Repository\PostRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
@@ -28,13 +26,12 @@ use Symfony\Component\Validator\Constraints\Valid;
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
     normalizationContext:[
-        'groups' => ['Post:read', 'Category:read'],
+        'groups' => ['Post:read', 'Category:read', 'read:User'],
         'openapi_definition_name' => 'Collection-normalization-Test'
     ],
     denormalizationContext:['groups' => ['Post:write', 'Category:write']],
     paginationClientItemsPerPage: true,
     operations: [
-        new Get(),
         new GetCollection(
             name: 'count',
             uriTemplate: '/posts/count',
@@ -91,9 +88,14 @@ use Symfony\Component\Validator\Constraints\Valid;
     ]
 )]
 #[Put(validationContext: ['groups' => [Post::class, 'validationGroups']])] // ici, on utilise l'approche "Dynamic Validation Groups" (Static function)
-#[Get(normalizationContext: [
-    'openapi_definition_name' => 'Detail'
-])]
+#[Get(
+    normalizationContext: [
+        'openapi_definition_name' => 'Detail' 
+    ],
+    openapiContext: [
+        'security' => [['bearerAuth' =>  []]]
+    ],
+)]
 #[GetCollection(
     paginationItemsPerPage: 3, 
     paginationMaximumItemsPerPage: 3,
@@ -112,7 +114,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 #[ApiFilter(SearchFilter::class, properties: ["title" => "partial"])] //exact or partial => exact by default
 #[Delete()]
 #[MetadataPost(validationContext: ['groups' => ['Post:createdAt:POST:maxToDay', 'Cagegory:name:POST:validationMax']])] // Ici, on a mis une règle de validation pour la Methode POST comme => la date de création "createdAt" doit être supérieure à la date d'aujourd'hui 
-class Post
+class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une condition dans l'Extension Doctrine pour filtrer les ressources
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -156,6 +158,10 @@ class Post
         ]
     )]
     private ?bool $online = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[Groups(['Post:read'])]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -253,6 +259,18 @@ class Post
     public function setOnline(bool $online): self
     {
         $this->online = $online;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

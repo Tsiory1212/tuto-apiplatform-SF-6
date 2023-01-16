@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as MetadataPost;
 use ApiPlatform\Metadata\Put;
+use App\Entity\Interface_\UserOwnedInterface;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints\Length;
 #[Put()]
 #[Delete()]
 #[GetCollection()]
-class Category
+class Category implements UserOwnedInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -44,6 +45,9 @@ class Category
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Post::class)]
     private Collection $posts;
+
+    #[ORM\ManyToOne(inversedBy: 'categories')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -93,6 +97,18 @@ class Category
                 $post->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

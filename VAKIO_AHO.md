@@ -110,6 +110,7 @@ Il y a 2 types :
 
     ou #[ApiResource( security: 'is_granted("ROLE_USER")' ) )]
 
+
 *Swagger-ui* 
 <!-- Pour ajouter l'icon Cadenas sur l'endpoint -->
     #[ApiResource(
@@ -123,8 +124,15 @@ Il y a 2 types :
     )]
 
 <!-- Syntax -->
-api_platform 2 : 'openapi_context' => [ 'security' => ['cookieAuth' => []]] <!-- 'security' => [] -->
 api_platform 2 : openapiContext: => ['security' => [['cookieAuth' =>  []]]] <!-- 'security' => [[]] -->
+        
+**OpenApi**
+<!-- Syntax -->
+  * ce synthax ne sert simplement à décorer l'interface de l'Endpoint Mais aussi de l'appliquer la sécurité JWT 
+
+    openapiContext: [
+        'security' => [['bearerAuth' =>  []]]
+    ],
 
 # Swagger
 ## Bouton Authorize (api-platform)
@@ -143,3 +151,10 @@ On crée une Subscriber qui implémente "EventSubscriberInterface" pour modifier
 **Intérrogation BDD**
  - Pour éviter d'intérroger à chq fois le BDD lorsqu'on utilise les endpoints "api", on se sert du provider de "lexik_jwt"
  - url : https://github.com/lexik/LexikJWTAuthenticationBundle/blob/2.x/Resources/doc/8-jwt-user-provider.rst
+
+
+# Permission et Security (Object's Owner)
+## Extension DOCTRINE   
+  - Sert à personnaliser la requête Doctrine sur les actions "collection" ou "item"
+  - Interface : "QueryCollectionExtensionInterface", "QueryItemExtensionInterface"
+  - url : https://api-platform.com/docs/core/extensions/#custom-doctrine-orm-extension
