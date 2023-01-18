@@ -31,3 +31,6 @@ services:
         bind:
             $itemProvider: '@api_platform.doctrine.orm.state.item_provider'
        
+    App\Serializer\PostContentBuilder:
+        decorates: 'api_platform.serializer.context_builder'
+        autoconfigure: false # En fonction de son interface, on desactive son injection dans la liste des services

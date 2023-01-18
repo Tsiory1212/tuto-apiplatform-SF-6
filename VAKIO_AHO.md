@@ -8,7 +8,10 @@
 
 # Controller & endpoint
 **Attention**
-    on n'oublie pas l'attribut #[AsController] pour un endpoint qui utilise un Controller personnalisé
+  - on n'oublie pas l'attribut #[AsController] pour un endpoint qui utilise un Controller personnalisé
+  - Il est très conseillé de mettre "application/ld+json" comme header "Accept", lorsqu'on faite une action GetCollection 
+        <!-- Ex : Probème dans Voter lorsque application/json à été choisi comme "Accept"... il ne traite que le premier élément -->
+        <!-- C'est pour la # Pagination aussi... infos sur *Hydra*-->
 
 ## Endpoint
 **Creation**
@@ -155,6 +158,22 @@ On crée une Subscriber qui implémente "EventSubscriberInterface" pour modifier
 
 # Permission et Security (Object's Owner)
 ## Extension DOCTRINE   
-  - Sert à personnaliser la requête Doctrine sur les actions "collection" ou "item"
+  - Sert à intercepter et à personnaliser la requête Doctrine sur les actions "collection" ou "item"
   - Interface : "QueryCollectionExtensionInterface", "QueryItemExtensionInterface"
   - url : https://api-platform.com/docs/core/extensions/#custom-doctrine-orm-extension
+
+# VOTER
+https://api-platform.com/docs/core/security/#hooking-custom-permission-checks-using-voters
+
+# Normalization et Denormalization
+*Serializer*
+L'interface "SerializerContextBuilderInterface" intercepte tous les normalization et denormalization en cours
+
+*Normalization*
+Pour intercepter toutes les normalisations en cours, on utilise l'interface "NormalizerInterface" avec "NormalizerAwareInterface"
+
+*Denormalization*
+<!-- Utile pour injecter l'utilisateur dans une requête (action POST) -->
+Pour intercepter toutes les dénormalisations en cours, on utilise l'interface "DenormalizerInterface" avec "DenormalizerAwareInterface"
+
+

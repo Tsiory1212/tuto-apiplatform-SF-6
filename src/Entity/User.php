@@ -158,11 +158,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     }
 
     /**
-     * On gros, cette function renvoie les infos JWT décodés en base64
+     * $payload contient les données renvoyées dans onLexikJwtAuthenticationOnJwtCreated() avec l'interface "EventSubscriberInterface" (see => JWTSubscriber.php)
+     * Attention, quand on fait $security->getUser() dans toute l'application, c'est ce nouvel User qui va être récupéré
+     * N'oublie pas de charger setRoles() car c'est important pour faire des conditions isGranted()
+     * Pour qu'une verification isGrandted() soit valide, les roles d'un User doit commencer par ROLE_
      */
     public static function createFromPayload($id, array $payload)
     {
-        $user = (new User())->setId($id)->setEmail($payload['username'] ?? '');
+        $user = (new User())
+            ->setId($id)
+            ->setEmail($payload['username'] ?? '')
+            ->setApiKey($payload['api_key'] ?? '')
+            ->setRoles($payload['roles'] ?? '')
+        ;
         return $user;
     }
 

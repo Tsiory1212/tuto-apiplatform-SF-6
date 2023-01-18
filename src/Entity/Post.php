@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as MetadataPost;
 use ApiPlatform\Metadata\Put;
+use App\Attribute\ApiAuthGroups;
 use App\Controller\CountPostController;
 use App\Controller\PublishPostController;
 use App\Entity\Interface_\UserOwnedInterface;
@@ -114,6 +115,10 @@ use Symfony\Component\Validator\Constraints\Valid;
 #[ApiFilter(SearchFilter::class, properties: ["title" => "partial"])] //exact or partial => exact by default
 #[Delete()]
 #[MetadataPost(validationContext: ['groups' => ['Post:createdAt:POST:maxToDay', 'Cagegory:name:POST:validationMax']])] // Ici, on a mis une règle de validation pour la Methode POST comme => la date de création "createdAt" doit être supérieure à la date d'aujourd'hui 
+#[ApiAuthGroups([ # Voici un ex de comment créer un attribut personnalisé 
+    'CAN_EDIT' => ['read:collection:Owner'],
+    'ROLE_USER' => ['read:collection:User']
+])]
 class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une condition dans l'Extension Doctrine pour filtrer les ressources
 {
     #[ORM\Id]
@@ -130,11 +135,11 @@ class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une 
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['Post:read', 'Post:write'])]
+    #[Groups(['read:collection:Owner'])]
     private ?string $slug = null;
     
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['Post:write', 'Post:read'])]
+    #[Groups(['Post:write', 'Post:read:Auth'])] # ce Post:read:Auth sera ajouter à la normalizationContext après verification dans "SerializerContextBuilderInterface"
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -155,7 +160,8 @@ class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une 
         openapiContext: [
             'example' => false,
             'description' => 'En ligne ou pas ?'
-        ]
+        ],
+        security: "is_granted('POST_VIEW', object) "
     )]
     private ?bool $online = null;
 
