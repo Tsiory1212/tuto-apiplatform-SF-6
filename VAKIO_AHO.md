@@ -157,6 +157,10 @@ On crée une Subscriber qui implémente "EventSubscriberInterface" pour modifier
 
 
 # Permission et Security (Object's Owner)
+## $secutity->getUser()
+  - le "User" retourné de createFromPayload() dans User.php sera le $security->getUser() dans toute l'application 
+  - N'oublie pas de charger createFromPayload() avec setRoles() car c'est important pour faire des conditions isGranted() 
+
 ## Extension DOCTRINE   
   - Sert à intercepter et à personnaliser la requête Doctrine sur les actions "collection" ou "item"
   - Interface : "QueryCollectionExtensionInterface", "QueryItemExtensionInterface"
