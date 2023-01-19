@@ -6,6 +6,19 @@
 5- #[ApiResource()] sur l'Entity
 6- url : https://127.0.0.1:8000/api
 
+# Normalization/Denormalization
+ * Normalization : GET / PUT / PATCH / DELETE et POST (agissant comme PUT)
+ * Denormalization :  POST
+
+ Serialize = "Object" ----(Normalization)---->    "Array"    ------(encode)----->  "JSON"
+
+# Operation
+*Collection*
+GET, POST
+
+*Item*
+GET, PUT, PATCH, DELETE
+
 # Controller & endpoint
 **Attention**
   - on n'oublie pas l'attribut #[AsController] pour un endpoint qui utilise un Controller personnalisé
