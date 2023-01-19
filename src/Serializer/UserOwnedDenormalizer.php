@@ -26,6 +26,8 @@ class UserOwnedDenormalizer implements DenormalizerInterface, DenormalizerAwareI
 
     public function supportsDenormalization(mixed $data, string $type, string $format = null) 
     {
+        dump('D_1');
+
         // dump($data);
         $reflectionClass = new ReflectionClass($type);
         $alreadyCalled = $data[self::ALREADY_CALLED_DENORMALIZER] ?? false;

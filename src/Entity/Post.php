@@ -9,21 +9,27 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post as MetadataPost;
 use ApiPlatform\Metadata\Put;
 use App\Attribute\ApiAuthGroups;
 use App\Controller\CountPostController;
+use App\Controller\PostImageController;
 use App\Controller\PublishPostController;
 use App\Entity\Interface_\UserOwnedInterface;
 use App\Repository\PostRepository;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Valid;
 
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
     normalizationContext:[
@@ -85,6 +91,30 @@ use Symfony\Component\Validator\Constraints\Valid;
             openapiContext: [
                 'summary' =>  'Permet de publier un article'
             ]
+        ),
+        new MetadataPost(
+            name: 'image',
+            uriTemplate: '/posts/{id}/image',
+            deserialize: false,
+            controller: PostImageController::class,
+            openapiContext: [
+                'summary' =>  'Permet de poster une image dans un Article déjà existé',
+                'requestBody' => [
+                    'content' => [
+                        'multipart/form-data' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'file' => [
+                                        'type' => 'string',
+                                        'format' => 'binary'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         )
     ]
 )]
@@ -114,6 +144,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 )]
 #[ApiFilter(SearchFilter::class, properties: ["title" => "partial"])] //exact or partial => exact by default
 #[Delete()]
+#[Patch()]
 #[MetadataPost(validationContext: ['groups' => ['Post:createdAt:POST:maxToDay', 'Cagegory:name:POST:validationMax']])] // Ici, on a mis une règle de validation pour la Methode POST comme => la date de création "createdAt" doit être supérieure à la date d'aujourd'hui 
 #[ApiAuthGroups([ # Voici un ex de comment créer un attribut personnalisé 
     'CAN_EDIT' => ['read:collection:Owner'],
@@ -168,6 +199,16 @@ class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[Groups(['Post:read'])]
     private ?User $user = null;
+
+   
+    #[Vich\UploadableField(mapping: "post_image", fileNameProperty: "filePath")]
+    private ?File $file;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $filePath = null;
+
+    #[Groups(['Post:read'])]
+    private ?string $fileUrl;
 
     public function __construct()
     {
@@ -277,6 +318,41 @@ class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une 
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getFilePath(): ?string
+    {
+        return $this->filePath;
+    }
+
+    public function setFilePath(?string $filePath): self
+    {
+        $this->filePath = $filePath;
+
+        return $this;
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFile(?File $file): self
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function getFileUrl(): ?string
+    {
+        return $this->fileUrl;
+    }
+
+    public function setFileUrl(string $fileUrl): self
+    {
+        $this->fileUrl = $fileUrl;
 
         return $this;
     }

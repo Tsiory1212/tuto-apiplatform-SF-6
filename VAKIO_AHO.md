@@ -181,3 +181,11 @@ Pour intercepter toutes les normalisations en cours, on utilise l'interface "Nor
 Pour intercepter toutes les dénormalisations en cours, on utilise l'interface "DenormalizerInterface" avec "DenormalizerAwareInterface"
 
 
+# IMAGE
+ - Activer "multipart/form-data" dans api_platform.yaml
+    api_platform:
+        formats: 
+            multipart: ['multipart/form-data']
+ 
+ *Pourquoi on utilise un Normalizer (PostNormalizer.php) pour modifier les data or on utilise 'POST' comme action*
+ *On peut utiliser un Controller pour intercepter un Article avec l'action 'POST' et le modifier plutôt que d'utiliser l'action 'PUT'*

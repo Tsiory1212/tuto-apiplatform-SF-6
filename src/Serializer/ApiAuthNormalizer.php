@@ -26,6 +26,7 @@ class ApiAuthNormalizer  implements NormalizerInterface, NormalizerAwareInterfac
 
 	public function supportsNormalization(mixed $data, string $format = null) 
     {
+        dump('A-Normalizer');
         // return false;
         if (!is_object($data) ) {
             return false;
