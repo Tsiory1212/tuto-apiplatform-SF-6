@@ -27,7 +27,6 @@ class PostNormalizer  implements NormalizerInterface, NormalizerAwareInterface
 
 	public function supportsNormalization(mixed $data, string $format = null) 
     {
-        dump('Post_NORMALIZATION');
 
         $key = self::ALREADY_CALLED_NORMALIZER;
         return !isset($data->$key) && $data instanceof Post;

@@ -19,7 +19,6 @@ class PostContentBuilder  implements SerializerContextBuilderInterface
 
 	public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array 
     {
-        dump('SSSSSSSSSS');
 
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
         $resourceClass = $context['resource_class'] ?? null;

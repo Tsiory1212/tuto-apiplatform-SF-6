@@ -350,7 +350,7 @@ class Post implements UserOwnedInterface # Cet Iterface nous sert à mettre une 
         return $this->fileUrl;
     }
 
-    public function setFileUrl(string $fileUrl): self
+    public function setFileUrl(?string $fileUrl): self
     {
         $this->fileUrl = $fileUrl;
 
